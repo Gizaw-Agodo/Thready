@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Pencil, ImagePlus } from "lucide-react";
 import Loader from "../components/Loader";
 import { supabase } from "../supabase-client";
-import { showError, showSuccess } from "../components/snackbar";
+import { showError, showSuccess } from "../components/Snackbar";
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
