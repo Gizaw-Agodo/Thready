@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, ImagePlus } from "lucide-react";
 import Loader from "../components/Loader";
 import { supabase } from "../supabase-client";
+import { showError, showSuccess } from "../components/snackbar";
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // NEW: communities state
+  const [communities, setCommunities] = useState<any[]>([]);
+  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      const { data, error } = await supabase.from("communities").select("id, name");
+      if (error) console.error("Error fetching communities:", error.message);
+      else setCommunities(data || []);
+    };
+    fetchCommunities();
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -24,7 +38,7 @@ const CreatePost = () => {
       if (imageFile) {
         const fileName = `${Date.now()}-${imageFile.name}`;
         const { error: storageError } = await supabase.storage
-          .from("post-images") 
+          .from("post-images")
           .upload(fileName, imageFile);
 
         if (storageError) throw storageError;
@@ -36,19 +50,22 @@ const CreatePost = () => {
         imageUrl = publicUrlData.publicUrl;
       }
 
-      const { data, error } = await supabase
-        .from("posts")
-        .insert({ title, content, image_url: imageUrl });
+      const { error } = await supabase.from("posts").insert({
+        title,
+        content,
+        image_url: imageUrl,
+        community_id: selectedCommunity, // attach community
+      });
 
       if (error) throw error;
 
-      console.log("Post created:", data);
-
+      showSuccess("Post created Successfuly")
       setTitle("");
       setContent("");
       setImageFile(null);
+      setSelectedCommunity(null);
     } catch (err: any) {
-      console.error("Error creating post:", err.message);
+      showError('Error creating post')
     } finally {
       setLoading(false);
     }
@@ -95,6 +112,28 @@ const CreatePost = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
               required
             />
+          </div>
+
+          {/* Community Select */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+              Select Community
+            </label>
+            <select
+              value={selectedCommunity ?? ""}
+              onChange={(e) => setSelectedCommunity(Number(e.target.value))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              required
+            >
+              <option value="" disabled>
+                -- Choose a community --
+              </option>
+              {communities.map((community) => (
+                <option key={community.id} value={community.id}>
+                  {community.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Image Upload */}

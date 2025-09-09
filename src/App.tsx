@@ -5,6 +5,9 @@ import Navbar from './components/Navbar'
 import CreatePost from './pages/CreatePostPage'
 import PostDetail from './pages/PostDetailPage'
 import { Toaster } from 'react-hot-toast'
+import CreateCommunity from './pages/CreateCommunityPage'
+import CommunitiesList from './pages/CommunitiesPage'
+import CommunityDetail from './pages/CommunityDetail'
 
 function App() {
 
@@ -25,8 +28,11 @@ function App() {
       <div>
         <Routes>
           <Route path = "/" element = {<Home/>} />
-          <Route path = "/create" element = {<CreatePost/>} />
+          <Route path = "/posts/create" element = {<CreatePost/>} />
           <Route path = "/posts/:id" element = {<PostDetail/>} />
+          <Route path = "/community/create" element = {<CreateCommunity/>} />
+          <Route path = "/communities" element = {<CommunitiesList/>} />
+          <Route path = "/communities/:id" element = {<CommunityDetail/>} />
         </Routes>
 
       </div>

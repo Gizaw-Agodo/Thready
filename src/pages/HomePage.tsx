@@ -10,16 +10,34 @@ const Home = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
+  
       const { data, error } = await supabase
         .from("posts")
-        .select("*")
+        .select(`
+          *,
+          comments(count),
+          votes(count)
+        `)
         .order("id", { ascending: false });
-      if (error) console.error(error);
-      else setPosts(data || []);
+  
+      if (error) {
+        console.error("Error fetching posts:", error);
+      } else {
+        const postsWithCounts = data.map((post: any) => ({
+          ...post,
+          comments_count: post.comments[0]?.count || 0,
+          likes_count: post.votes[0]?.count || 0,
+        }));
+  
+        setPosts(postsWithCounts);
+      }
+  
       setLoading(false);
     };
+  
     fetchPosts();
   }, []);
+  
 
   if (loading)
     return (
@@ -41,8 +59,8 @@ const Home = () => {
             id = {post.id}
             title={post.title}
             image_url={post.image_url}
-            likes={post.likes || 0}
-            comments={post.comments || 0}
+            likes={post.likes_count || 0}
+            comments={post.comments_count || 0}
 
           />
         ))}

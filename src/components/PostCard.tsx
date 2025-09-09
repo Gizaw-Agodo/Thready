@@ -23,8 +23,8 @@ const PostCard = ({
     >
       {/* Top row: bullet + title */}
       <div className="flex items-center gap-3 p-4">
-        <div className="w-5 h-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full"></div>
-        <h2 className="text-lg font-semibold text-gray-800 truncate">
+        <div className="w-4 h-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full"></div>
+        <h2 className="text-md font-semibold text-gray-800 truncate">
           {title}
         </h2>
       </div>
